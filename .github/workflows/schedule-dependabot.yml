@@ -1,0 +1,36 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    # Every Monday at 00:00 UTC
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+jobs:
+  deps:
+    name: Dependabot
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - run: npm ci
+
+      - uses: dependabot/fetch-metadata@v2
+        with:
+          skip-commitping: "true"
+
+      - name: Create PR
+        run: |
+          npx @dependabot/dependabot-core bundle-install \
+            --cached \
+            --create-pull-request \
+            --commit-message "Bump dependencies" \
+            --labels dependencies \
+            --reviewer crontinel/maintainers \
+            || echo "No updates available"
