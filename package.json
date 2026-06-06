@@ -1,6 +1,6 @@
 {
-  "name": "crontinel-node",
-  "version": "0.1.1",
+  "name": "@crontinel/node",
+  "version": "0.1.2",
   "description": "Crontinel monitoring SDK for Node.js applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -36,6 +36,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/crontinel/node.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "bugs": {
     "url": "https://github.com/crontinel/node/issues"

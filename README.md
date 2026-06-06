@@ -1,15 +1,17 @@
-# crontinel-node
+# @crontinel/node
 
 Crontinel monitoring SDK for Node.js applications. Send cron, queue, and job monitoring events from any Node.js app — standalone or alongside the `crontinel/laravel` PHP package.
 
 ## Install
 
 ```bash
-npm install crontinel-node
+# Authenticate to GitHub Packages first
+npm login --auth-type=legacy --scope=@crontinel --registry=https://npm.pkg.github.com
+npm install @crontinel/node
 # or
-yarn add crontinel-node
+yarn add @crontinel/node
 # or
-pnpm add crontinel-node
+pnpm add @crontinel/node
 ```
 
 ## Requirements
@@ -21,7 +23,7 @@ pnpm add crontinel-node
 Initialize the client once, then reuse it for cron heartbeats, queue submissions, and custom events:
 
 ```typescript
-import Crontinel from 'crontinel-node';
+import Crontinel from '@crontinel/node';
 
 const crontinel = new Crontinel({
   apiKey: process.env.CRONTINEL_API_KEY!,
@@ -89,7 +91,7 @@ const reports = await crontinel.monitorSchedule('reports:generate', async () => 
 
 ```typescript
 import cron from 'node-cron';
-import Crontinel from 'crontinel-node';
+import Crontinel from '@crontinel/node';
 
 const crontinel = new Crontinel({ apiKey: process.env.CRONTINEL_API_KEY! });
 
@@ -104,7 +106,7 @@ cron.schedule('0 9 * * *', () => {
 
 ```typescript
 import { Worker } from 'bullmq';
-import Crontinel from 'crontinel-node';
+import Crontinel from '@crontinel/node';
 
 const crontinel = new Crontinel({ apiKey: process.env.CRONTINEL_API_KEY! });
 
