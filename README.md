@@ -18,6 +18,8 @@ pnpm add @crontinel/node
 
 ## Quick Start
 
+Initialize the client once, then reuse it for cron heartbeats, queue submissions, and custom events:
+
 ```typescript
 import Crontinel from '@crontinel/node';
 
@@ -26,23 +28,34 @@ const crontinel = new Crontinel({
   apiUrl: process.env.CRONTINEL_API_URL,   // defaults to https://app.crontinel.com
   appName: 'my-service',                   // optional, default: 'node'
 });
+```
 
-// Report a cron job run
+### Cron heartbeat / submission
+
+`scheduleRun()` is the cron heartbeat. Call it after a scheduled job completes so Crontinel can track success, failure, and duration:
+
+```typescript
 await crontinel.scheduleRun({
   command: 'reports:generate',
   duration_ms: 2340,
   exit_code: 0,   // 0 = success, 1 = failure
 });
+```
 
-// Report queue worker activity
+### Queue submissions
+
+```typescript
 await crontinel.queueProcessed({
   queue: 'emails',
   processed: 12,
   failed: 0,
   duration_ms: 8901,
 });
+```
 
-// Send a custom event or alert
+### Custom events
+
+```typescript
 await crontinel.event({
   key: 'disk-space-warning',
   message: 'Disk usage above 90%',
