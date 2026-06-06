@@ -3,7 +3,7 @@
  * Report cron, queue, and job monitoring events from any Node.js application.
  *
  * @example
- * import Crontinel from 'crontinel-node'
+ * import Crontinel from '@crontinel/node'
  *
  * const crontinel = new Crontinel({
  *   apiKey: process.env.CRONTINEL_API_KEY,

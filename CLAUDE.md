@@ -1,11 +1,11 @@
-# crontinel-node — CLAUDE.md
+# @crontinel/node — CLAUDE.md
 
 Node.js SDK for Crontinel cron and queue monitoring.
 
 ## Package
-- npm: `crontinel-node`
+- npm: `@crontinel/node`
 - GitHub: `github.com/crontinel/node`
-- Publish: `npm publish --access public` (CI auto-publishes on git tag push)
+- Publish: GitHub Packages via `npm publish --registry=https://npm.pkg.github.com` (CI auto-publishes on git tag push)
 
 ## Stack
 - TypeScript, Vitest, tsx for tests
