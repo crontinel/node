@@ -45,6 +45,22 @@ describe('Crontinel Node SDK', () => {
       const client = new Crontinel({ apiKey: 'test' });
       expect((client as unknown as { appName: string }).appName).toBe('node');
     });
+
+    it('should preserve the apiKey flow and trim apiUrl before submission', async () => {
+      const client = new Crontinel({
+        apiKey: API_KEY,
+        apiUrl: 'https://custom.example.com/',
+      });
+
+      await client.scheduleRun({ command: 'bootstrap-check', duration_ms: 10 });
+
+      const req = lastRequest();
+      const headers = req.opts.headers as Record<string, string>;
+
+      expect(req.url).toBe('https://custom.example.com/api/mcp');
+      expect(headers.Authorization).toBe(`Bearer ${API_KEY}`);
+      expect(headers['User-Agent']).toMatch(/^crontinel-node:/);
+    });
   });
 
   describe('scheduleRun()', () => {
