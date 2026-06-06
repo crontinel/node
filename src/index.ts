@@ -3,7 +3,7 @@
  * Report cron, queue, and job monitoring events from any Node.js application.
  *
  * @example
- * import Crontinel from '@crontinel/node'
+ * import Crontinel from 'crontinel-node'
  *
  * const crontinel = new Crontinel({
  *   apiKey: process.env.CRONTINEL_API_KEY,
@@ -81,7 +81,7 @@ export class Crontinel {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.apiKey}`,
         'User-Agent': this.agent,
       },
       body: JSON.stringify({
@@ -96,7 +96,7 @@ export class Crontinel {
       throw new Error(`Crontinel API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json() as { result?: unknown; error?: { message: string } };
+    const data = (await response.json()) as { result?: unknown; error?: { message: string } };
 
     if (data.error) {
       throw new Error(`Crontinel RPC error: ${data.error.message}`);
