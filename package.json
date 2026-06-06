@@ -1,6 +1,6 @@
 {
-  "name": "@crontinel/node",
-  "version": "0.1.0",
+  "name": "crontinel-node",
+  "version": "0.1.1",
   "description": "Crontinel monitoring SDK for Node.js applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
