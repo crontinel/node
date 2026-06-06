@@ -5,9 +5,9 @@ Crontinel monitoring SDK for Node.js applications. Send cron, queue, and job mon
 ## Install
 
 ```bash
+# Configure the scope for GitHub Packages first (required for fresh installs)
+echo "@crontinel:registry=https://npm.pkg.github.com" >> ~/.npmrc
 npm install @crontinel/node
-# if you install from GitHub Packages, add this scope mapping first:
-# @crontinel:registry=https://npm.pkg.github.com
 # or
 yarn add @crontinel/node
 # or
