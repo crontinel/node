@@ -26,6 +26,7 @@ jobs:
       - run: npm run test
       - run: npm run build
 
+      # Publish to GitHub Packages
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -35,6 +36,17 @@ jobs:
       - run: npm publish --registry=https://npm.pkg.github.com
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Publish to public npm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
+
+      - run: npm publish --registry=https://registry.npmjs.org --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
