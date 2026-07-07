@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Crontinel } from '../src/index.js';
+import { AgentDaemon } from './AgentDaemon.js';
 
 // Mock fetch
 const mockFetch = vi.fn();
@@ -246,6 +247,58 @@ describe('Crontinel Node SDK', () => {
       const req = lastRequest();
       expect(req.body.method).toBe('notify/schedule_run');
       expect(req.body.params.exit_code).toBe(1);
+    });
+  });
+});
+
+describe('AgentDaemon', () => {
+  describe('constructor', () => {
+    it('should require apiKey', () => {
+      expect(() => new AgentDaemon({ apiKey: '', appId: 'my-app' })).toThrow('CRONTINEL_API_KEY is required');
+    });
+
+    it('should require appId', () => {
+      expect(() => new AgentDaemon({ apiKey: 'ctn_test_key', appId: '' })).toThrow('CRONTINEL_APP_ID is required');
+    });
+
+    it('should accept valid config', () => {
+      const daemon = new AgentDaemon({ apiKey: 'ctn_test_key', appId: 'my-app' });
+      expect(daemon).toBeInstanceOf(AgentDaemon);
+    });
+
+    it('should default agentId to hostname', () => {
+      const daemon = new AgentDaemon({ apiKey: 'ctn_test_key', appId: 'my-app' });
+      expect((daemon as unknown as { agentId: string }).agentId).toBeTruthy();
+    });
+
+    it('should accept custom agentId', () => {
+      const daemon = new AgentDaemon({ apiKey: 'ctn_test_key', appId: 'my-app', agentId: 'my-custom-id' });
+      expect((daemon as unknown as { agentId: string }).agentId).toBe('my-custom-id');
+    });
+  });
+
+  describe('printSystemdConfig', () => {
+    it('should output systemd unit configuration', () => {
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      AgentDaemon.printSystemdConfig();
+      expect(logSpy).toHaveBeenCalled();
+      const output = logSpy.mock.calls.map((c) => c[0]).join('\n');
+      expect(output).toContain('[Unit]');
+      expect(output).toContain('[Service]');
+      expect(output).toContain('[Install]');
+      expect(output).toContain('Description=Crontinel Node Agent');
+      expect(output).toContain('Restart=always');
+      logSpy.mockRestore();
+    });
+  });
+
+  describe('setOutputWriter', () => {
+    it('should accept an output writer function', () => {
+      const daemon = new AgentDaemon({ apiKey: 'ctn_test_key', appId: 'my-app' });
+      const writer = vi.fn();
+      daemon.setOutputWriter(writer);
+      // No error means it works
+      expect(true).toBe(true);
     });
   });
 });

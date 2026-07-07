@@ -3,6 +3,9 @@
   "version": "0.1.2",
   "description": "Crontinel monitoring SDK for Node.js applications",
   "main": "dist/index.js",
+  "bin": {
+    "crontinel": "./dist/cli.js"
+  },
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
