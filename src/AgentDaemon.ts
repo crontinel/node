@@ -9,6 +9,17 @@ interface AgentConfig {
   appId?: string;
   agentId?: string;
   agentName?: string;
+  /**
+   * Glob-style patterns of commands this agent is permitted to execute.
+   * `*` matches any sequence of characters; everything else must match
+   * literally. Patterns match the *entire* command string.
+   *
+   * SECURITY: an empty or undefined list means NO commands are permitted.
+   * This is a fail-closed default — it is not "allow everything." Every
+   * command the cloud API sends must be explicitly allowlisted before it
+   * will be executed.
+   */
+  allowedCommands?: string[];
 }
 
 interface CommandPayload {
@@ -24,6 +35,28 @@ const HEARTBEAT_INTERVAL_S = 60;
 const MAX_RECONNECT_DELAY_S = 60;
 const POLL_HTTP_TIMEOUT_S = 15;
 
+// ── Command allowlist ───────────────────────────────────────────────────
+
+/**
+ * Converts a glob-style pattern (`*` = wildcard, everything else literal)
+ * into an anchored RegExp that matches the entire string.
+ */
+function globToRegExp(pattern: string): RegExp {
+  const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, (ch) => (ch === '*' ? '*' : `\\${ch}`));
+  const regexBody = escaped.replace(/\*/g, '.*');
+  return new RegExp(`^${regexBody}$`);
+}
+
+/**
+ * Checks whether `command` matches at least one glob-style pattern in
+ * `patterns`. An empty/undefined pattern list always rejects — this is a
+ * fail-closed check, matching the AgentConfig.allowedCommands contract.
+ */
+export function isCommandAllowed(command: string, patterns: string[] | undefined): boolean {
+  if (!patterns || patterns.length === 0) return false;
+  return patterns.some((pattern) => globToRegExp(pattern).test(command));
+}
+
 // ── Agent Daemon ────────────────────────────────────────────────────────
 
 export class AgentDaemon {
@@ -38,6 +71,7 @@ export class AgentDaemon {
   private appId: string;
   private agentId: string;
   private agentName: string;
+  private allowedCommands: string[];
 
   constructor(config: AgentConfig) {
     if (!config.apiKey) {
@@ -52,6 +86,17 @@ export class AgentDaemon {
     this.appId = config.appId;
     this.agentId = config.agentId || hostname();
     this.agentName = config.agentName || `node-agent:${hostname()}`;
+
+    // Fail-closed: if allowedCommands isn't explicitly passed, fall back to
+    // the CRONTINEL_AGENT_ALLOWED_COMMANDS env var (comma-separated). If
+    // neither is set, the allowlist is empty and NO commands will execute.
+    this.allowedCommands =
+      config.allowedCommands ??
+      (process.env.CRONTINEL_AGENT_ALLOWED_COMMANDS
+        ? process.env.CRONTINEL_AGENT_ALLOWED_COMMANDS.split(',')
+            .map((s) => s.trim())
+            .filter((s) => s.length > 0)
+        : []);
   }
 
   /**
@@ -225,6 +270,11 @@ export class AgentDaemon {
     try {
       // Acknowledge receipt first
       await this.acknowledge(triggerId);
+
+      if (!isCommandAllowed(commandStr, this.allowedCommands)) {
+        this.log(`[${triggerId}] Rejected: command not in allowlist: ${commandStr}`);
+        throw new Error('Command rejected: not in allowlist');
+      }
 
       // Execute via shell
       output = execSync(commandStr, {

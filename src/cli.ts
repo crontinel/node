@@ -25,6 +25,10 @@ function printUsage(): void {
   console.log('  CRONTINEL_APP_ID      Required. Your app slug or numeric ID.');
   console.log('  CRONTINEL_API_URL     Optional. Default: https://app.crontinel.com');
   console.log('  CRONTINEL_AGENT_ID    Optional. Default: hostname');
+  console.log('  CRONTINEL_AGENT_ALLOWED_COMMANDS');
+  console.log('                        Optional. Comma-separated glob patterns of commands');
+  console.log('                        this agent may execute (`*` wildcard, else literal).');
+  console.log('                        Default: empty — NO commands are permitted until set.');
   console.log('');
 }
 
