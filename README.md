@@ -78,10 +78,16 @@ const reports = await crontinel.monitorSchedule('reports:generate', async () => 
 
 ## Environment variables
 
+The client reads none by itself; pass them to the constructor as in the Quick Start.
+
 | Variable | Default | Description |
 |---|---|---|
-| `CRONTINEL_API_KEY` | — | Your Crontinel API key (required) |
-| `CRONTINEL_API_URL` | `https://app.crontinel.com` | Crontinel SaaS or self-hosted endpoint |
+| `CRONTINEL_API_KEY` | — | Your app's ingest key, passed as `apiKey` (required) |
+| `CRONTINEL_API_URL` | `https://app.crontinel.com` | Self-hosted endpoint, passed as `apiUrl` |
+
+Both `import Crontinel from '@crontinel/node'` and `const { Crontinel } = require('@crontinel/node')` work from 0.1.3.
+
+Calls go to the MCP endpoint (`/api/mcp`) and carry no outcome metrics. To alert when a job finished but did nothing, send the [HTTP check-in receipt](https://docs.crontinel.com/check-in/recipes/) with a count from inside the job.
 
 ## Framework integrations
 
